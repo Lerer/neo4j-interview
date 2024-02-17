@@ -8,6 +8,11 @@ RETURN a,r,s,c,o;
 MATCH (c:Customer)-[o:OWNS]->(a:Account)-[r:PURCHASED]-(f:Fund)-[h:HOLDS]->(s:Stock {ticker:'MSFT'}) 
 RETURN a,r,s,c,o,f,h;
 
+// Alternatively
+:param requestedStockTicker => 'MSFT';
+MATCH (c:Customer)-[o:OWNS]->(a:Account)-[r:PURCHASED]->(s:Stock {ticker:$requestedStockTicker}) 
+RETURN a,r,s,c,o;
+
 
 // 2c) Return a count of the number of times a fund holds a stock, sorted in descending count order.
 MATCH (f:Fund)-[h:HOLDS]->(s:Stock)
@@ -42,7 +47,7 @@ CALL {
     WITH n
     MATCH (n)--(dc:DayClose) RETURN dc
 }
-MATCH (c:Customer)-[]-(a:Account)-[p:PURCHASED]->(f:Fund|Stock)-[d:DAILY_CLOSE]->(dc)
+MATCH (c:Customer)-[:OWNS]-(a:Account)-[p:PURCHASED]->(f:Fund|Stock)-[d:DAILY_CLOSE]->(dc)
 RETURN 
   c.name as `Owner name`,
   a.accountType as `Account Type`,
